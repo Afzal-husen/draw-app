@@ -7,4 +7,4 @@ app.use(express.json());
 app.use("/api/v1", router);
 app.use(errorHandler);
 
-app.listen(3001, () => "http server running at port 3000");
+app.listen(3001, () => "http server running at port 3001");

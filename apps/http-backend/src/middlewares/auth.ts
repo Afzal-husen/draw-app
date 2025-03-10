@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { CustomError } from "./custom-error";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { JWT_SECRET } from "@repo/backend-common";
 
 export const authenticate: RequestHandler = (req, res, next) => {
   try {
@@ -13,7 +14,7 @@ export const authenticate: RequestHandler = (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) return next(new CustomError(404, "Token not found"));
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    const decoded = jwt.verify(token, JWT_SECRET);
     if (!decoded || (decoded as JwtPayload).userId) {
       return next(new CustomError(400, "bad request"));
     } else {
