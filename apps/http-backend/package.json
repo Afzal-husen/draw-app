@@ -13,9 +13,11 @@
   "description": "",
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/express": "^5.0.0"
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.9"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
   }
 }
