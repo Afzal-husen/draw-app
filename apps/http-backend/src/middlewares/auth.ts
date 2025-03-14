@@ -15,10 +15,12 @@ export const authenticate: RequestHandler = (req, res, next) => {
 
     if (!token) return next(new CustomError(404, "Token not found"));
     const decoded = jwt.verify(token, JWT_SECRET);
-    if (!decoded || (decoded as JwtPayload).userId) {
+
+    if (typeof decoded === "string") return;
+
+    if (!decoded || !(decoded as JwtPayload).userId) {
       return next(new CustomError(400, "bad request"));
     } else {
-      // @ts-ignore
       req.userId = decoded.userId;
       next();
     }

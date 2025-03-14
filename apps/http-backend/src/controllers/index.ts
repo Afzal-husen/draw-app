@@ -23,32 +23,61 @@ const signup: RequestHandler = async (req, res, next) => {
       },
     });
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
-    res
-      .status(201)
-      .json({ error: false, message: "User created successfully" });
+    res.status(201).json({ error: false, message: "Signedup successfully" });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
 
-const signin: RequestHandler = (req, res, next) => {
+const signin: RequestHandler = async (req, res, next) => {
   try {
     const parsedBody = signinSchema.safeParse(req.body);
     if (!parsedBody.success) {
       return next(new CustomError(400, parsedBody.error.message));
     }
+    const user = await prisma.user.findFirst({
+      where: { email: parsedBody.data.email },
+    });
+
+    if (!user) return next(new CustomError(404, "User not does not exist"));
+
+    const isPasswordMatch = await bcryt.compare(
+      parsedBody.data.password,
+      user?.password,
+    );
+    if (!isPasswordMatch)
+      return next(new CustomError(400, "Wrong email or password"));
+
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+
+    res
+      .status(200)
+      .json({ error: false, message: "Login successfull", data: token });
   } catch (error) {
     next(error);
   }
 };
 
-const createRoom: RequestHandler = (req, res, next) => {
+const createRoom: RequestHandler = async (req, res, next) => {
   try {
+    if (!req.userId) return next(new CustomError(403, "User unauthorized"));
+
     const parsedBody = createRoomSchema.safeParse(req.body);
     if (!parsedBody.success) {
       return next(new CustomError(400, parsedBody.error.message));
     }
+
+    await prisma.room.create({
+      data: {
+        slug: parsedBody.data.roomId,
+        adminId: req.userId,
+      },
+    });
+
+    res
+      .status(201)
+      .json({ error: false, message: "Room created successfully" });
   } catch (error) {
     next(error);
   }

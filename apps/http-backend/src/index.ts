@@ -7,4 +7,8 @@ app.use(express.json());
 app.use("/api/v1", router);
 app.use(errorHandler);
 
+app.get("/", (req, res) => {
+  res.send("Hello world");
+});
+
 app.listen(3001, () => "http server running at port 3001");
